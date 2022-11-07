@@ -19,6 +19,7 @@ def sdf_grid(sdf_function, resolution):
     xx, yy, zz = np.meshgrid(voxel_coords, voxel_coords, voxel_coords, indexing='ij')
     
     grid = sdf_function(xx.flatten(), yy.flatten(), zz.flatten()).reshape(resolution, resolution, resolution)
+    # TODO write this without meshgrid function
              
     return grid
         

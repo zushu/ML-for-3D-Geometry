@@ -14,5 +14,11 @@ def occupancy_grid(sdf_function, resolution):
 
     # ###############
     # TODO: Implement
-    raise NotImplementedError
+    voxel_coords = np.linspace(-0.5, 0.5, num=resolution)
+    xx, yy, zz = np.meshgrid(voxel_coords, voxel_coords, voxel_coords, indexing='ij')
+   
+    grid = sdf_function(xx.flatten(), yy.flatten(), zz.flatten()).reshape(resolution, resolution, resolution)
+    grid = np.where(grid<=0, 1, 0)
+
+    return grid
     # ###############
