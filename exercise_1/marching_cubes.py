@@ -158,6 +158,7 @@ def compute_cube_index(cube: np.array, isolevel=0.) -> int:
             bit = 0
         # bits more significant from right to left
         index += 2**(7-i) * bit
+#        index += 2**i * bit
     
     return index
     # ###############
@@ -192,6 +193,7 @@ def marching_cubes(sdf: np.array) -> tuple:
 
     #            index_grid[i, j, k] = compute_cube_index(cube) 
                 index = compute_cube_index(cube)
+#                print("cube index: ", index)
                 for l in range(15):
                     if triangle_table[index][l] == -1:
                         #no triangle, add nothing
@@ -227,11 +229,11 @@ def vertex_interpolation(p_1, p_2, v_1, v_2, isovalue=0.):
     :param isovalue: The iso value, always 0 in our case
     :return: A single point
     """
-#    t = (isovalue-v_1) / (v_2 - v_1)
+    t = (isovalue-v_1) / (v_2 - v_1)
     # vertex interpolation
-    #return p_1 + t*(p_2 - p_1)
+    return p_1 + t*(p_2 - p_1)
     # previous version kept for debugging
-    return p_1 + (p_2 - p_1)/2.
+    #return p_1 + (p_2 - p_1)/2.
 
 # gets joint vertices' indices from given edge
 def get_vertices(edge_index):
@@ -260,13 +262,13 @@ def get_vertices(edge_index):
      
 #get grid indices given vertex idx
 def get_ijk(v_index):
-    vertices_list = { 0: (1, 0, 1), 
+    vertices_list = { 0: (0, 1, 1), 
                       1: (1, 1, 1), 
-                      2: (1, 1, 0), 
-                      3: (1, 0, 0), 
-                      4: (0, 0, 1), 
-                      5: (0, 1, 1), 
-                      6: (0, 1, 0), 
+                      2: (1, 0, 1), 
+                      3: (0, 0, 1), 
+                      4: (0, 1, 0), 
+                      5: (1, 1, 0), 
+                      6: (1, 0, 0), 
                       7: (0, 0, 0) }
 
     return vertices_list[v_index]
