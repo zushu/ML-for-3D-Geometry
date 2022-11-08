@@ -175,21 +175,20 @@ def marching_cubes(sdf: np.array) -> tuple:
 
     # ###############
     # TODO: Implement
-    #raise NotImplementedError
     vertices = []
     faces = []
     grid_dim = sdf.shape[0] 
-    index_grid = np.zeros((grid_dim-1, grid_dim-1, grid_dim-1))
+#    index_grid = np.zeros((grid_dim-1, grid_dim-1, grid_dim-1))
     # grid for coordinates of each voxel, whole grid represents a unit cube
- #   voxel_coords = np.linspace(-0.5, 0.5, num=grid_dim)
+#    voxel_coords = np.linspace(-0.5, 0.5, num=grid_dim)
 #    xx, yy, zz = np.meshgrid(voxel_coords, voxel_coords, voxel_coords, indexing='ij')
     # first make a cube from 8 neighbouring voxels
     for i in range(grid_dim-1):
         for j in range(grid_dim-1):
             for k in range(grid_dim-1):
                 # first 4 elements: bottom vertices, next 4: top vertices, all in ccw order
-                cube = np.array([sdf[i+1, j, k+1], sdf[i+1, j+1, k+1], sdf[i+1, j+1, k], sdf[i+1, j, k], \
-                                sdf[i, j, k+1], sdf[i, j+1, k+1], sdf[i, j+1, k], sdf[i, j, k]])
+                # i -> x, j -> y, k -> z
+                cube = np.array([sdf[i, j+1, k+1], sdf[i+1, j+1, k+1], sdf[i+1, j, k+1], sdf[i, j, k+1], sdf[i, j+1, k], sdf[i+1, j+1, k], sdf[i+1, j, k], sdf[i, j, k]])
 
     #            index_grid[i, j, k] = compute_cube_index(cube) 
                 index = compute_cube_index(cube)
@@ -203,20 +202,15 @@ def marching_cubes(sdf: np.array) -> tuple:
                     i1, j1, k1 = get_ijk(v1_idx)
                     i2, j2, k2 = get_ijk(v2_idx)
                     
-  #                  p1 = np.array([xx[i+i1, j+j1, k+k1], yy[i+i1, j+j1, k+k1], zz[i+i1, j+j1, k+k1]]) 
+ #                   p1 = np.array([xx[i+i1, j+j1, k+k1], yy[i+i1, j+j1, k+k1], zz[i+i1, j+j1, k+k1]]) 
                     p1 = np.array([i+i1, j+j1, k+k1]) 
-   #                 p2 = np.array([xx[i+i2, j+j2, k+k2], yy[i+i2, j+j2, k+k2], zz[i+i2, j+j2, k+k2]]) 
+  #                  p2 = np.array([xx[i+i2, j+j2, k+k2], yy[i+i2, j+j2, k+k2], zz[i+i2, j+j2, k+k2]]) 
                     p2 = np.array([i+i2, j+j2, k+k2]) 
-                    #print("p1: ", p1)
-                    #print("p2:", p2)
                     vertex_loc = vertex_interpolation(p1, p2, sdf[i+i1, j+j1, k+k1], sdf[i+i2, j+j2, k+k2])
                     vertices.append(np.array(vertex_loc))
-                    #print("l: ", l)
                     if ((l+1) % 3 == 0): # three vertices added
-                        #print("face addition")
-                        end_idx_vertices = len(vertices) - 1 # index of last element of vertices list
+                        end_idx_vertices = len(vertices)-1 # index of last element of vertices list
                         faces.append(np.array([end_idx_vertices-2,end_idx_vertices-1, end_idx_vertices]))
-                        #print("faces: ", faces)
     
     return (np.array(vertices), np.array(faces))
 
@@ -233,18 +227,37 @@ def vertex_interpolation(p_1, p_2, v_1, v_2, isovalue=0.):
     :param isovalue: The iso value, always 0 in our case
     :return: A single point
     """
-    return p_1 + (p_2 - p_1) / 2.
+#    t = (isovalue-v_1) / (v_2 - v_1)
+    # vertex interpolation
+    #return p_1 + t*(p_2 - p_1)
+    # previous version kept for debugging
+    return p_1 + (p_2 - p_1)/2.
 
 # gets joint vertices' indices from given edge
 def get_vertices(edge_index):
+    edges_list = { 0: (0, 1),
+                   1: (1, 2),
+                   2: (3, 2), 
+                   3: (0, 3), 
+                   4: (4, 5), 
+                   5: (5, 6), 
+                   6: (7, 6), 
+                   7: (4, 7), 
+                   8: (0, 4), 
+                   9: (1, 5), 
+                   10: (2, 6), 
+                   11: (3, 7) }
+    """
     if edge_index in range(3) or edge_index in range(4, 7):
-        return (edge_index+1, edge_index)
+        return (edge_index, edge_index+1)
 
     if edge_index == 3 or edge_index == 7:
-        return (edge_index, edge_index-3)
+        return (edge_index-3, edge_index)
     # edged 8, 9, 10, 11
-    return (edge_index-4, edge_index-8)
-    
+    return (edge_index-8, edge_index-4)
+    """
+    return edges_list[edge_index]
+     
 #get grid indices given vertex idx
 def get_ijk(v_index):
     vertices_list = { 0: (1, 0, 1), 
@@ -258,7 +271,4 @@ def get_ijk(v_index):
 
     return vertices_list[v_index]
 
-def get_triangle_vertex_locs(cube_index, ):
-    voxel_coords = np.linspace(-0.5, 0.5, num=grid_dim)
-    xx, yy, zz = np.meshgrid(voxel_coords, voxel_coords, voxel_coords, indexing='ij')
     
