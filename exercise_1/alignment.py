@@ -15,14 +15,29 @@ def procrustes_align(pc_x, pc_y):
 
     # TODO: Your implementation starts here ###############
     # 1. get centered pc_x and centered pc_y
+    centroid_x = np.mean(pc_x, axis=0)
+    pc_x_c = np.subtract(pc_x,centroid_x)
+    centroid_y = np.mean(pc_y, axis=0)
+    pc_y_c = np.subtract(pc_y, centroid_y)
+    
     # 2. create X and Y both of shape 3XN by reshaping centered pc_x, centered pc_y
+    X = np.transpose(pc_x_c)
+    Y = np.transpose(pc_y_c)
     # 3. estimate rotation
+    # M = Y*X_T 
+    u, s, vh = np.linalg.svd(np.dot(Y,pc_x_c), full_matrices=False)
+    # det(v) = det(vh) because v is a square matrix
+    S = np.identity(3)
+    if np.linalg.det(u)*np.linalg.det(vh) != 1:
+        S[2, 2] = -1
+    
+    R = np.matmul(np.matmul(u,S),vh) 
     # 4. estimate translation
+    t = centroid_y - np.matmul(R, centroid_x)
     # R and t should now contain the rotation (shape 3x3) and translation (shape 3,)
     # TODO: Your implementation ends here ###############
 
     t_broadcast = np.broadcast_to(t[:, np.newaxis], (3, pc_x.shape[0]))
-    print('Procrustes Aligment Loss: ', np.abs((np.matmul(R, pc_x.T) + t_broadcast) - pc_y.T).mean())
 
     return R, t
 
