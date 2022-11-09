@@ -15,7 +15,6 @@ def export_mesh_to_obj(path, vertices, faces):
 
     # ###############
     # TODO: Implement
-#    raise NotImplementedError
     with open(path, 'a') as obj_file:
         for v in vertices:
             obj_file.write("v %f %f %f\n" % (v[0], v[1], v[2]))
@@ -35,5 +34,7 @@ def export_pointcloud_to_obj(path, pointcloud):
 
     # ###############
     # TODO: Implement
-    raise NotImplementedError
+    with open(path, 'a') as obj_file:
+        for p in pointcloud:
+            obj_file.write("v %f %f %f\n" % (p[0], p[1], p[2]))
     # ###############
