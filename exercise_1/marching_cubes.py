@@ -194,10 +194,12 @@ def marching_cubes(sdf: np.array) -> tuple:
     #            index_grid[i, j, k] = compute_cube_index(cube) 
                 index = compute_cube_index(cube)
 #                print("cube index: ", index)
+                tri_iter = 0
                 for l in range(15):
                     if triangle_table[index][l] == -1:
                         #no triangle, add nothing
                         break
+                    tri_iter +=1
                     # get 2 vertices from each edge
                     # first get vertex index, then vertex coordinate
                     v1_idx, v2_idx = get_vertices(triangle_table[index][l]) 
@@ -210,9 +212,11 @@ def marching_cubes(sdf: np.array) -> tuple:
                     p2 = np.array([i+i2, j+j2, k+k2]) 
                     vertex_loc = vertex_interpolation(p1, p2, sdf[i+i1, j+j1, k+k1], sdf[i+i2, j+j2, k+k2])
                     vertices.append(np.array(vertex_loc))
-                    if ((l+1) % 3 == 0): # three vertices added
+                    if tri_iter == 3:
+#                    if ((l+1) % 3 == 0): # three vertices added
                         end_idx_vertices = len(vertices)-1 # index of last element of vertices list
                         faces.append(np.array([end_idx_vertices-2,end_idx_vertices-1, end_idx_vertices]))
+                        tri_iter = 0
     
     return (np.array(vertices), np.array(faces))
 
@@ -261,15 +265,16 @@ def get_vertices(edge_index):
     return edges_list[edge_index]
      
 #get grid indices given vertex idx
+# offset to be added
 def get_ijk(v_index):
-    vertices_list = { 0: (0, 1, 1), 
-                      1: (1, 1, 1), 
-                      2: (1, 0, 1), 
-                      3: (0, 0, 1), 
-                      4: (0, 1, 0), 
-                      5: (1, 1, 0), 
-                      6: (1, 0, 0), 
-                      7: (0, 0, 0) }
+    vertices_list = { 0: (0,0,0), 
+                      1: (1,0,0), 
+                      2: (1,1,0), 
+                      3: (0,1,0),
+                      4: (0,0,1),
+                      5: (1,0,1),
+                      6: (1,1,1), 
+                      7: (0,1,1)}
 
     return vertices_list[v_index]
 
