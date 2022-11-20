@@ -7,14 +7,20 @@ from exercise_2.util.toy_data import generate_toy_data
 
 class SimpleDataset(torch.utils.data.Dataset):
     # TODO: Implement __init__, __getitem__, __len__
-    def __init__(self):
-        pass
+    def __init__(self, split):
+        if split == 'train':
+            self.input_data, self.labels = generate_toy_data(4096)            
+        elif split == 'val': 
+            self.input_data, self.labels = generate_toy_data(1024)
+#        pass
 
     def __getitem__(self, idx):
-        pass
+#        pass
+        return (self.input_data[idx].reshape((1, 32, 32, 32)), self.labels[idx])
 
     def __len__(self):
-        pass
+#        pass
+        return len(self.labels)
 
 
 class SimpleModel(torch.nn.Module):
