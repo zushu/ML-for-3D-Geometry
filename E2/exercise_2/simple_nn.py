@@ -12,14 +12,11 @@ class SimpleDataset(torch.utils.data.Dataset):
             self.input_data, self.labels = generate_toy_data(4096)            
         elif split == 'val': 
             self.input_data, self.labels = generate_toy_data(1024)
-#        pass
 
     def __getitem__(self, idx):
-#        pass
         return (self.input_data[idx].reshape((1, 32, 32, 32)), self.labels[idx])
 
     def __len__(self):
-#        pass
         return len(self.labels)
 
 
@@ -29,15 +26,22 @@ class SimpleModel(torch.nn.Module):
         self.conv1 = torch.nn.Conv3d(in_channels=1, out_channels=4, kernel_size=4, stride=3, padding=1)
         self.bn1 = torch.nn.BatchNorm3d(4)
         # TODO: Add conv2 and conv3 with the same parameters as conv1; also, add bn2 and bn3
-
+        self.conv2 = torch.nn.Conv3d(in_channels=4, out_channels=8, kernel_size=4, stride=3, padding=1)
+        self.bn2 = torch.nn.BatchNorm3d(8)
+        self.conv3 = torch.nn.Conv3d(in_channels=8, out_channels=16, kernel_size=4, stride=3, padding=1)
+        self.bn3 = torch.nn.BatchNorm3d(16)
         # TODO: Add Linear layer for classification which reduces the number of features from 16 to 2
+        self.linear = torch.nn.Linear(in_features=16, out_features=2)
         # TODO: Add a ReLU
+        self.relu = torch.nn.ReLU()
 
     def forward(self, x):
         x = self.relu(self.bn1(self.conv1(x)))
         # TODO: Move tensor through layers 2 and 3
+        x = self.relu(self.bn2(self.conv2(x))) 
+        x = self.relu(self.bn3(self.conv3(x)))
         # TODO: Apply the classification layer. Use .view() to reshape the output of layer 3 into the correct format
-
+        x = self.linear(x.view(x.shape[0], 16))
         return x
 
 
